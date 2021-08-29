@@ -1,3 +1,5 @@
+import math
+
 class Node:
     def __init__(self, coordinates):
         self.x = coordinates[0]
@@ -45,9 +47,44 @@ class Wireframe:
             node.x = center_x + scale * (node.x - center_x)
             node.y = center_y + scale * (node.y - center_y)
             node.z *= scale
-# my_wireframe = Wireframe()
-# my_wireframe.addNodes([(0,0,0), (1,2,3), (3,2,1)])
-# my_wireframe.addNodes([(1,2)])
+
+    def findCenter(self):
+        num_nodes = len(self.nodes)
+        meanX = sum([node.x for node in self.nodes]) / num_nodes
+        meanY = sum([node.y for node in self.nodes])/ num_nodes
+        meanZ = sum([node.z for node in self.nodes])/ num_nodes
+
+        return(meanX, meanY, meanZ)
+    
+    def rotateX(self, c, radians):
+        cx, cy, cz = c
+        for node in self.nodes:
+            y      = node.y - cy
+            z      = node.z - cz
+            d      = math.hypot(y, z)
+            theta  = math.atan2(y, z) + radians
+            node.z = cz + d * math.cos(theta)
+            node.y = cy + d * math.sin(theta)
+            
+    def rotateY(self, c, radians):
+        cx, cy, cz = c
+        for node in self.nodes:
+            x      = node.x - cx
+            z      = node.z - cz
+            d      = math.hypot(x, z)
+            theta  = math.atan2(x, z) + radians
+            node.z = cz + d * math.cos(theta)
+            node.x = cx + d * math.sin(theta)
+
+    def rotateZ(self, c, radians):    
+        cx, cy, cz = c    
+        for node in self.nodes:
+            x      = node.x - cx
+            y      = node.y - cy
+            d      = math.hypot(y, x)
+            theta  = math.atan2(y, x) + radians
+            node.x = cx + d * math.cos(theta)
+            node.y = cy + d * math.sin(theta)
 
 if __name__ == "__main__":
     cube_nodes = [(x,y,z) for x in (0,1) for y in (0,1) for z in (0,1)]
