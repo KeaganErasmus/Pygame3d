@@ -2,6 +2,15 @@ import sys
 import wireframe
 import pygame
 
+key_to_function = {
+    pygame.K_LEFT:   (lambda x: x.translateAll('x', -10)),
+    pygame.K_RIGHT:  (lambda x: x.translateAll('x',  10)),
+    pygame.K_DOWN:   (lambda x: x.translateAll('y',  10)),
+    pygame.K_UP:     (lambda x: x.translateAll('y', -10)),
+    pygame.K_EQUALS: (lambda x: x.scaleAll(1.25)),
+    pygame.K_MINUS:  (lambda x: x.scaleAll( 0.8))
+    }
+
 class ProjectionViewer:
     #display 3D object on a pygame instance
 
@@ -29,6 +38,9 @@ class ProjectionViewer:
                 if event.type == pygame.QUIT:
                     running = False
                     exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key in key_to_function:
+                        key_to_function[event.key](self)
             
             self.display()
             pygame.display.flip()
@@ -48,6 +60,18 @@ class ProjectionViewer:
             if self.displayNodes:
                 for node in wireframe.nodes:
                     pygame.draw.circle(self.screen, self.nodeColour, (int(node.x), int(node.y)), self.nodeRadius, 0)
+
+    def translateAll(self, axis, d):
+        for wireframe in self.wireframes.values():
+            wireframe.translate(axis, d)
+    
+    def scaleAll(self, scale):
+        center_x = self.width/2
+        center_y = self.height/2
+
+        for wireframe in self.wireframes.values():
+            wireframe.scale((center_x, center_y), scale)
+
 
 if __name__ == "__main__":
     pv = ProjectionViewer(400, 300)
